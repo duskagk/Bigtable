@@ -1,14 +1,14 @@
 package main
 
 import (
-	"bigtable/bigtable"
+	"bigtable/sstable"
 	"fmt"
 	"log"
 )
 
 func main() {
 	// 새로운 BigTable 인스턴스 생성
-	bt,_ := bigtable.NewBigTable("./data")
+	bt,_ := sstable.NewTablet("./data")
 
 	// 테이블 생성
 	err := bt.CreateTable("users")

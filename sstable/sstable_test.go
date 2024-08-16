@@ -1,4 +1,4 @@
-package bigtable
+package sstable
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func TestBigTableLargeDataSingleInsert(t *testing.T) {
 	testTimeout := 5 * time.Minute
 	timer := time.NewTimer(testTimeout)
 
-	bt, err := NewBigTable("./temp")
+	bt, err := NewTablet("./temp")
 	if err != nil {
 		t.Fatalf("Failed to create BigTable instance: %v", err)
 	}
@@ -96,7 +96,7 @@ func TestBigTableLargeDataSingleInsert(t *testing.T) {
 
 func TestDebugBigTableLoading(t *testing.T) {
 	dataDir := "./temp"
-	bt, err := NewBigTable(dataDir)
+	bt, err := NewTablet(dataDir)
 	if err != nil {
 		t.Fatalf("Failed to create BigTable instance: %v", err)
 	}
@@ -144,7 +144,7 @@ func TestDebugBigTableLoading(t *testing.T) {
 }
 
 func TestVerifyExistingData(t *testing.T) {
-	bt, err := NewBigTable("./temp")
+	bt, err := NewTablet("./temp")
 	if err != nil {
 		t.Fatalf("Failed to create BigTable instance: %v", err)
 	}
@@ -203,7 +203,7 @@ func TestMemoryUsage(t *testing.T) {
 	runtime.ReadMemStats(&m)
 	beforeAlloc := m.Alloc
 
-	bt, err := NewBigTable("./temp")
+	bt, err := NewTablet("./temp")
 	if err != nil {
 		t.Fatalf("Failed to create BigTable instance: %v", err)
 	}
@@ -238,7 +238,7 @@ func TestBigTableLargeDataWithExtendedVariableInsertPattern(t *testing.T) {
 	testTimeout := 10 * time.Minute
 	timer := time.NewTimer(testTimeout)
 
-	bt, err := NewBigTable("./temp")
+	bt, err := NewTablet("./temp")
 	if err != nil {
 		t.Fatalf("Failed to create BigTable instance: %v", err)
 	}

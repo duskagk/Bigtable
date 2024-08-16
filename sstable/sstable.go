@@ -1,4 +1,4 @@
-package bigtable
+package sstable
 
 import (
 	"encoding/gob"
@@ -44,13 +44,13 @@ type Table struct {
 	mutex     sync.RWMutex
 }
 
-type BigTable struct {
+type Tablet struct {
 	Tables  map[string]*Table
 	dataDir string
 }
 
-func NewBigTable(dataDir string) (*BigTable, error) {
-	bt := &BigTable{
+func NewTablet(dataDir string) (*Tablet, error) {
+	bt := &Tablet{
 		Tables:  make(map[string]*Table),
 		dataDir: dataDir,
 	}
@@ -68,7 +68,7 @@ func NewBigTable(dataDir string) (*BigTable, error) {
 	return bt, nil
 }
 
-func (bt *BigTable) loadFromDisk() error {
+func (bt *Tablet) loadFromDisk() error {
 	fmt.Println("Starting loadFromDisk")
 	files, err := os.ReadDir(bt.dataDir)
 	if err != nil {
@@ -90,7 +90,7 @@ func (bt *BigTable) loadFromDisk() error {
 	return nil
 }
 
-func (bt *BigTable) loadTableFromDisk(tableName string) error {
+func (bt *Tablet) loadTableFromDisk(tableName string) error {
 	table := &Table{
 		Name: tableName,
 		memTable: &MemTable{
@@ -148,7 +148,7 @@ func (bt *BigTable) loadTableFromDisk(tableName string) error {
 	return nil
 }
 
-func (bt *BigTable) CreateTable(name string) error {
+func (bt *Tablet) CreateTable(name string) error {
 	if _, exists := bt.Tables[name]; exists {
 		return fmt.Errorf("table %s already exists", name)
 	}
@@ -161,7 +161,7 @@ func (bt *BigTable) CreateTable(name string) error {
 	return os.MkdirAll(filepath.Join(bt.dataDir, name), 0755)
 }
 
-func (bt *BigTable) Put(tableName, rowKey, columnFamily, column string, value []byte) error {
+func (bt *Tablet) Put(tableName, rowKey, columnFamily, column string, value []byte) error {
 	table, exists := bt.Tables[tableName]
 	if !exists {
 		return fmt.Errorf("table %s does not exist", tableName)
@@ -198,7 +198,7 @@ func (bt *BigTable) Put(tableName, rowKey, columnFamily, column string, value []
 	return nil
 }
 
-func (bt *BigTable) flushMemTable(table *Table) error {
+func (bt *Tablet) flushMemTable(table *Table) error {
 	if len(table.memTable.rows) == 0 {
 		return nil
 	}
@@ -241,7 +241,7 @@ func (bt *BigTable) flushMemTable(table *Table) error {
 	return nil
 }
 
-func (bt *BigTable) Get(tableName, rowKey, columnFamily, column string) ([]byte, error) {
+func (bt *Tablet) Get(tableName, rowKey, columnFamily, column string) ([]byte, error) {
 	table, exists := bt.Tables[tableName]
 	if !exists {
 		return nil, fmt.Errorf("table %s does not exist", tableName)
@@ -277,7 +277,7 @@ func (bt *BigTable) Get(tableName, rowKey, columnFamily, column string) ([]byte,
 	return nil, fmt.Errorf("row %s or cell %s:%s does not exist", rowKey, columnFamily, column)
 }
 
-func (bt *BigTable) getFromSSTable(sstable SSTable, rowKey, cellKey string) ([]byte, error) {
+func (bt *Tablet) getFromSSTable(sstable SSTable, rowKey, cellKey string) ([]byte, error) {
 	file, err := os.Open(sstable.fileName)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %v", sstable.fileName, err)
