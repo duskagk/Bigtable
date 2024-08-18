@@ -1,59 +1,51 @@
 package main
 
 import (
-	"bigtable/sstable"
-	"fmt"
+	"bigtable/internal/bigtable"
 	"log"
 )
 
 func main() {
-	// 새로운 BigTable 인스턴스 생성
-	bt,_ := sstable.NewTablet("./data")
+    log.Println("Starting BigTable test...")
 
-	// 테이블 생성
-	err := bt.CreateTable("users")
-	if err != nil {
-		log.Fatalf("Failed to create table: %v", err)
-	}
+    bt := bigtable.NewBigTable()
 
-	// 데이터 삽입
-	err = bt.Put("users", "user1", "info", "name", []byte("Alice"))
-	if err != nil {
-		log.Fatalf("Failed to put data: %v", err)
-	}
+    // Test creating a table
+    err := bt.CreateTable("users")
+    if err != nil {
+        log.Fatalf("Failed to create table: %v", err)
+    }
+    log.Println("Table 'users' created successfully")
 
-	err = bt.Put("users", "user1", "info", "email", []byte("alice@example.com"))
-	if err != nil {
-		log.Fatalf("Failed to put data: %v", err)
-	}
+    // Test writing data
+    err = bt.Write("users", "user1", []byte("John Doe"))
+    if err != nil {
+        log.Fatalf("Failed to write data: %v", err)
+    }
+    log.Println("Data written successfully")
 
-	err = bt.Put("users", "user2", "info", "name", []byte("Bob"))
-	if err != nil {
-		log.Fatalf("Failed to put data: %v", err)
-	}
+    // Test reading data
+    data, err := bt.Read("users", "user1")
+    if err != nil {
+        log.Fatalf("Failed to read data: %v", err)
+    }
+    log.Printf("Read data: %s", string(data))
 
-	// 데이터 조회
-	name, err := bt.Get("users", "user1", "info", "name")
-	if err != nil {
-		log.Fatalf("Failed to get data: %v", err)
-	}
-	fmt.Printf("User1 name: %s\n", string(name))
+    // Test reading non-existent data
+    _, err = bt.Read("users", "user2")
+    if err != nil {
+        log.Printf("Expected error when reading non-existent data: %v", err)
+    } else {
+        log.Fatalf("Expected an error when reading non-existent data, but got none")
+    }
 
-	email, err := bt.Get("users", "user1", "info", "email")
-	if err != nil {
-		log.Fatalf("Failed to get data: %v", err)
-	}
-	fmt.Printf("User1 email: %s\n", string(email))
+    // Test creating an existing table
+    err = bt.CreateTable("users")
+    if err != nil {
+        log.Printf("Expected error when creating existing table: %v", err)
+    } else {
+        log.Fatalf("Expected an error when creating an existing table, but got none")
+    }
 
-	name2, err := bt.Get("users", "user2", "info", "name")
-	if err != nil {
-		log.Fatalf("Failed to get data: %v", err)
-	}
-	fmt.Printf("User2 name: %s\n", string(name2))
-
-	// 존재하지 않는 데이터 조회
-	_, err = bt.Get("users", "user2", "info", "email")
-	if err != nil {
-		fmt.Printf("Expected error: %v\n", err)
-	}
+    log.Println("All tests completed successfully")
 }
