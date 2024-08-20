@@ -10,8 +10,8 @@ type KVNode struct {
 	mu    sync.RWMutex
 }
 
-func NewKVNode() (*KVNode, error) {
-	store, err := kvstore.NewKVStore()
+func NewKVNode(database string) (*KVNode, error) {
+	store, err := kvstore.NewKVStore(database)
 	if err != nil {
 		return nil, err
 	}
@@ -28,6 +28,18 @@ func (n *KVNode) Get(key string) (string, error) {
 	n.mu.RLock()
 	defer n.mu.RUnlock()
 	return n.store.Get(key)
+}
+
+func (n *KVNode) RangeQuery(startKey, endKey string) (map[string]string, error){
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.store.RangeQuery(startKey,endKey)
+}
+
+func (n *KVNode) BatchWrite(operations []kvstore.BatchOperation) error {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	return n.store.BatchOperation(operations)
 }
 
 func (n *KVNode) Delete(key string) error {

@@ -8,7 +8,7 @@ import (
 
 func main() {
 	
-	kvNode, err := node.NewKVNode()
+	kvNode, err := node.NewKVNode("kv_data")
 
 	if err !=nil{
 		log.Fatalf("Failed to create KVnode: %v", err)
@@ -20,7 +20,7 @@ func main() {
 
 	server := rest.NewServer(kvService)
 
-	if err := server.Start(":8080"); err != nil{
+	if err := server.Start(":6195"); err != nil{
 		log.Fatalf("Server failed to start : %v", err)
 	}
 
