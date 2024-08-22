@@ -7,10 +7,13 @@ GOGET=$(GOCMD) get
 BINARY_NAME=kv_server
 BINARY_UNIX=$(BINARY_NAME)_unix
 
+
+CGO_ENABLED=0
+
 all: test build
 
 build:
-	$(GOBUILD) -o $(BINARY_NAME) -v ./cmd/server
+	CGO_ENABLED=$(CGO_ENABLED) $(GOBUILD) -o $(BINARY_NAME) -v ./cmd/server
 
 test:
 	$(GOTEST) -v ./...

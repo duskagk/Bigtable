@@ -20,6 +20,8 @@ func (s *Server) SetupRoutes() {
 	http.HandleFunc("/delete", s.service.HandleDelete)
 	http.HandleFunc("/range",s.service.HandleRange)
 	http.HandleFunc("/batch", s.service.HandleBatchOperation)
+	http.HandleFunc("/scankey",s.service.HandleScanKey)
+	http.HandleFunc("/scankeylower",s.service.HandleScanKeysLower)
 }
 
 

@@ -36,6 +36,20 @@ func (n *KVNode) RangeQuery(startKey, endKey string) (map[string]string, error){
 	return n.store.RangeQuery(startKey,endKey)
 }
 
+func (n *KVNode) ScanKey(prefix string, cursor string, limit int) ([]string, string, error) {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.store.ScanKey(prefix,cursor, limit)
+}
+
+func (n *KVNode) ScanKeysLower(prefix string, maxTimestamp int64, cursor string, limit int) ([]string, string, error){
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.store.ScanKeysLower(prefix,maxTimestamp,cursor, limit)
+}
+
+
+
 func (n *KVNode) BatchWrite(operations []kvstore.BatchOperation) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
@@ -47,6 +61,9 @@ func (n *KVNode) Delete(key string) error {
 	defer n.mu.Unlock()
 	return n.store.Delete(key)
 }
+
+
+
 
 func (n *KVNode) Close() error {
 	n.mu.Lock()
