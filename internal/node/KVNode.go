@@ -48,6 +48,11 @@ func (n *KVNode) ScanKeysLower(prefix string, maxTimestamp int64, cursor string,
 	return n.store.ScanKeysLower(prefix,maxTimestamp,cursor, limit)
 }
 
+func (n *KVNode) ScanValueByKey(prefix string, cursor string, limit int) ([]map[string]string, string, error) {
+    n.mu.RLock()
+    defer n.mu.RUnlock()
+    return n.store.ScanValueByKey(prefix, cursor, limit)
+}
 
 
 func (n *KVNode) BatchWrite(operations []kvstore.BatchOperation) error {
@@ -62,7 +67,17 @@ func (n *KVNode) Delete(key string) error {
 	return n.store.Delete(key)
 }
 
+func (n *KVNode) ScanOffset(prefix string, offset int) (string, error) {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.store.ScanOffset(prefix, offset)
+}
 
+func (n *KVNode) TotalKey(prefix string) (int,error){
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.store.TotalKey(prefix)
+}
 
 
 func (n *KVNode) Close() error {
